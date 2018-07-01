@@ -53,7 +53,7 @@ class FaceRecognizerSkill(MycroftSkill):
         self.connect()
 
     def initialize(self):
-        LOG.info('initialize')
+        LOG.info('initializer')
         recognize_intent = IntentBuilder("FaceRecognizerIntent").require("Face").build()
         self.register_intent(recognize_intent, self.handle_recognize_intent)
 
