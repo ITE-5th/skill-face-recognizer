@@ -22,7 +22,7 @@ from .code.misc.camera import Camera
 # from .default_config import DefaultConfig
 from .code.misc.receiver import Receiver
 from .code.misc.sender import Sender
-from .default_config import DefaultConfig
+# from .default_config import DefaultConfig
 
 LOG.warning('Running Skill Face Recognizer On Python ' + sys.version)
 
@@ -50,33 +50,33 @@ class FaceRecognizerSkill(MycroftSkill):
         self.port = None
         self.host = None
         self.camera = Camera(width=800, height=600)
-        self.connection_type = DefaultConfig.connection_type
+        # self.connection_type = DefaultConfig.connection_type
         self.registered = False
         self.new_person = None
         # self.connect()
 
     @intent_handler(IntentBuilder("RecognizeIntent").require('Face'))
     def handle_recognize_intent(self):
-        try:
-            image, _ = self.camera.take_image()
-            msg = FaceRecognitionMessage(image=image)
-            sent = self.ensure_send(msg)
-            if not sent:
-                self.speak_dialog('RegisterError')
-                return False
-
-            response = self.receiver.receive()
-            LOG.info(response)
-            result = self.handle_message(response.get('result'))
-            self.speak_dialog("result", result)
-
-        except Exception as e:
-            LOG.info('Something is wrong')
-            LOG.info(str(e))
-            LOG.info(str(traceback.format_exc()))
-            self.speak("Exception")
-            self.connect()
-            return False
+        # try:
+        #     image, _ = self.camera.take_image()
+        #     msg = FaceRecognitionMessage(image=image)
+        #     sent = self.ensure_send(msg)
+        #     if not sent:
+        #         self.speak_dialog('RegisterError')
+        #         return False
+        #
+        #     response = self.receiver.receive()
+        #     LOG.info(response)
+        #     result = self.handle_message(response.get('result'))
+        #     self.speak_dialog("result", result)
+        #
+        # except Exception as e:
+        #     LOG.info('Something is wrong')
+        #     LOG.info(str(e))
+        #     LOG.info(str(traceback.format_exc()))
+        #     self.speak("Exception")
+        #     self.connect()
+        #     return False
         LOG.info('recognize')
         return True
 
