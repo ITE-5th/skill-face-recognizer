@@ -4,7 +4,8 @@
 import sys
 
 from adapt.intent import IntentBuilder
-from mycroft import MycroftSkill
+from mycroft import MycroftSkill, intent_handler
+
 from mycroft.util.log import LOG
 
 # from .code.message.add_person_message import AddPersonMessage
@@ -30,27 +31,27 @@ except ImportError:
 
 class FaceRecognizerSkill(MycroftSkill):
     def __init__(self):
-        super(FaceRecognizerSkill, self).__init__("FaceRecognizerSkill")
+        super(FaceRecognizerSkill, self).__init__(name="FaceRecognizerSkill")
         LOG.warning('Running Skill Face Recognizer')
 
         # if "server_url" not in self.settings:
         #     self.settings["server_url"] = DefaultConfig.server_url
-        self.name = None
-        self.socket = None
-        self.receiver = None
-        self.sender = None
-        self.port = None
-        self.host = None
+        # self.name = None
+        # self.socket = None
+        # self.receiver = None
+        # self.sender = None
+        # self.port = None
+        # self.host = None
         # self.camera = Camera(width=800, height=600)
         # self.connection_type = DefaultConfig.connection_type
-        self.registered = False
-        self.new_person = None
+        # self.registered = False
+        # self.new_person = None
         # self.connect()
 
     def initialize(self):
         LOG.info('initializer')
-        recognize_intent = IntentBuilder("FaceRecognizerIntent").require("TEMP").build()
-        self.register_intent(recognize_intent, self.handle_recognize_intent)
+        # recognize_intent = IntentBuilder("FaceRecognizerIntent").require("TEMP").build()
+        # self.register_intent(recognize_intent, self.handle_recognize_intent)
 
     # def connect(self):
     #     try:
@@ -117,6 +118,7 @@ class FaceRecognizerSkill(MycroftSkill):
     #             LOG.warning(str(e))
     #     return True
 
+    @intent_handler(IntentBuilder("RecognizeIntent").require('Ahmed'))
     def handle_recognize_intent(self):
         # try:
         #     image, _ = self.camera.take_image()
