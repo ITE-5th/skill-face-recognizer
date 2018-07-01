@@ -172,7 +172,7 @@ class FaceRecognizerSkill(MycroftSkill):
             return False
         # result = self.receiver.receive()
         LOG.info(result)
-        self.speak_dialog("AddResult")
+        self.speak_dialog("AddResult", {'p_name': self.u_name})
 
         self.images_count += self.images_count
         if self.images_count > DefaultConfig.MaxImagesCount:
