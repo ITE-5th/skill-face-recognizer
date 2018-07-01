@@ -83,24 +83,24 @@ class FaceRecognizerSkill(MycroftSkill):
             result = self.receiver.receive()
             return result
 
-    def register_face(self):
-        LOG.info("register face")
-        if self.registered:
-            return True
-
-        self.name = self.settings.get('name', DefaultConfig.name)
-
-        msg = RegisterFaceRecognitionMessage(self.name)
-        result = self.send_recv(msg)
-        if not result:
-            self.speak_dialog('RegisterError')
-            return False
-
-        LOG.info(result)
-        self.speak_dialog("AddResult", self.new_person)
-        self.registered = True
-        return True
-
+    # def register_face(self):
+    #     LOG.info("register face")
+    #     if self.registered:
+    #         return True
+    #
+    #     self.name = self.settings.get('name', DefaultConfig.name)
+    #
+    #     msg = RegisterFaceRecognitionMessage(self.name)
+    #     result = self.send_recv(msg)
+    #     if not result:
+    #         self.speak_dialog('RegisterError')
+    #         return False
+    #
+    #     LOG.info(result)
+    #     self.speak_dialog("AddResult", self.new_person)
+    #     self.registered = True
+    #     return True
+    #
     def ensure_send(self, msg):
         retries = 3
         while retries > 0:
@@ -141,43 +141,43 @@ class FaceRecognizerSkill(MycroftSkill):
             return False
         return True
 
-    @intent_handler(IntentBuilder("FaceIntent").require('add').require('name'))
-    def add(self, message):
-        if not self.registered:
-            registered = self.register_face()
-            if not registered:
-                return False
-        LOG.info(message.data)
-        self.new_person = message.data.get('name')
-        return True
-
-    @intent_handler(IntentBuilder("FaceIntent").require('capture'))
-    def capture(self, message):
-        if not self.registered:
-            registered = self.register_face()
-            if not registered:
-                return False
-        if self.new_person is None:
-            self.speak('Please add person before capture')
-            return True
-        image, _ = self.camera.take_image(1)
-        if image is None:
-            self.speak_dialog("PersonCountError")
-            return True
-        msg = AddPersonMessage(image)
-        # sent = self.ensure_send(msg)
-        result = self.send_recv(msg)
-        if not result:
-            return False
-        # result = self.receiver.receive()
-        LOG.info(result)
-        self.speak_dialog("AddResult")
-
-        self.images_count += self.images_count
-        if self.images_count > DefaultConfig.MaxImagesCount:
-            self.new_person = None
-
-        return True
+    # @intent_handler(IntentBuilder("FaceIntent").require('add').require('name'))
+    # def add(self, message):
+    #     if not self.registered:
+    #         registered = self.register_face()
+    #         if not registered:
+    #             return False
+    #     LOG.info(message.data)
+    #     self.new_person = message.data.get('name')
+    #     return True
+    #
+    # @intent_handler(IntentBuilder("FaceIntent").require('capture'))
+    # def capture(self, message):
+    #     if not self.registered:
+    #         registered = self.register_face()
+    #         if not registered:
+    #             return False
+    #     if self.new_person is None:
+    #         self.speak('Please add person before capture')
+    #         return True
+    #     image, _ = self.camera.take_image(1)
+    #     if image is None:
+    #         self.speak_dialog("PersonCountError")
+    #         return True
+    #     msg = AddPersonMessage(image)
+    #     # sent = self.ensure_send(msg)
+    #     result = self.send_recv(msg)
+    #     if not result:
+    #         return False
+    #     # result = self.receiver.receive()
+    #     LOG.info(result)
+    #     self.speak_dialog("AddResult")
+    #
+    #     self.images_count += self.images_count
+    #     if self.images_count > DefaultConfig.MaxImagesCount:
+    #         self.new_person = None
+    #
+    #     return True
 
     @staticmethod
     def handle_message(response):
