@@ -9,9 +9,9 @@ from adapt.intent import IntentBuilder
 from mycroft import MycroftSkill, intent_handler
 from mycroft.util.log import LOG
 
-from .code.message.add_person_message import AddPersonMessage
+# from .code.message.add_person_message import AddPersonMessage
 from .code.message.face_recognition_message import FaceRecognitionMessage
-from .code.message.register_face_recognition_message import RegisterFaceRecognitionMessage
+# from .code.message.register_face_recognition_message import RegisterFaceRecognitionMessage
 from .code.misc.camera import Camera
 from .code.misc.http.api import get_http_request_type
 from .code.misc.http.api import request_http
