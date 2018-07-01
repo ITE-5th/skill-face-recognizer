@@ -35,14 +35,19 @@ class Camera:
 
     def check_faces(self, file_name='./temp/Image.jpg', faces_count=1):
         import dlib
-        from skimage import io
+        import numpy
+        from PIL import Image
         print('analysing faces count')
         detector = dlib.get_frontal_face_detector()
-        image = io.imread(file_name)
+        # from skimage import io
+        # image = io.imread(file_name)
+        image = numpy.asarray(Image.open(file_name)).setflags(write=True)
+        image.setflags(write=True)
         rects = detector(image, 1)
         has_one_face = len(rects) == faces_count
         print(has_one_face)
         return has_one_face
+
 
 if __name__ == '__main__':
     c = Camera(width=800, height=600)
