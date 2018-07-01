@@ -117,7 +117,7 @@ class FaceRecognizerSkill(MycroftSkill):
                 LOG.warning(str(e))
         return True
 
-    @intent_handler(IntentBuilder("FaceRecognizerIntent").require('face'))
+    @intent_handler(IntentBuilder("FaceRecognizerIntent").require('face').build())
     def recognise(self, message):
         try:
             image, _ = self.camera.take_image()
