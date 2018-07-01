@@ -1,0 +1,31 @@
+{
+  "name": "Face Recognize Skill",
+  "skillMetadata": {
+    "sections": [
+      {
+        "name": "User Setup",
+        "fields": [
+          {
+            "name": "name",
+            "type": "text",
+            "label": "user name",
+            "value": "guest"
+          },
+          {
+            "name": "connection_type",
+            "type": "select",
+            "label": "Connection Type",
+            "options": "Socket|socket;HTTP|http",
+            "value": "socket"
+          },
+          {
+            "name": "server_url",
+            "type": "text",
+            "label": "Remote Server URL:",
+            "value": "192.168.43.243"
+          }
+        ]
+      }
+    ]
+  }
+}
