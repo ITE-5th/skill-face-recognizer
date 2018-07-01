@@ -1,7 +1,6 @@
 # File Path Manager
 # import os
 # sys.path.append(os.path.dirname(os.path.dirname(os.path.dirname(__file__))))
-import socket
 import sys
 
 from adapt.intent import IntentBuilder
@@ -13,8 +12,6 @@ from mycroft.util.log import LOG
 from .code.misc.camera import Camera
 # from .code.misc.http.api import get_http_request_type
 # from .code.misc.http.api import request_http
-from .code.misc.receiver import Receiver
-from .code.misc.sender import Sender
 from .default_config import DefaultConfig
 
 # TODO: Make sure "." before module name is not missing
@@ -52,7 +49,7 @@ class FaceRecognizerSkill(MycroftSkill):
 
     def initialize(self):
         LOG.info('initializer')
-        recognize_intent = IntentBuilder("FaceRecognizerIntent").require("Face").build()
+        recognize_intent = IntentBuilder("FaceRecognizerIntent").require("TEMP").build()
         self.register_intent(recognize_intent, self.handle_recognize_intent)
 
     # def connect(self):
@@ -183,34 +180,34 @@ class FaceRecognizerSkill(MycroftSkill):
     #
     #     return True
 
-    @staticmethod
-    def handle_message(response):
-        """
-        converts server response to meaningful sentence
-        :param response: string of people names includes unknown
-        :return: dictionary contains sentence in result
-        """
-        unknown = 'Unknown'
-        persons = response.split(',')
-        unk_count = sum([x.split(' ').count(unknown) for i, x in enumerate(persons)])
-
-        # remove Unknown
-        persons = [x for i, x in enumerate(persons) if x.split(' ')[0] != unknown]
-        for idx, person in enumerate(persons):
-            person = person.split(' ')
-            persons[idx] = person[0].replace('_', ' ').title()
-            persons[idx] += ' . '
-            # persons[idx] += ' With probability of {} Percent . '.format(person[1])
-
-        if unk_count > 0:
-            persons.append(str(unk_count) + ' Unknown persons . ')
-
-        persons_count = len(persons)
-        phrase = ''
-        for i in range(persons_count):
-            phrase += persons[i]
-            phrase += ' and ' if i == persons_count - 2 and persons_count > 1 else ''
-        return {'result': phrase}
+    # @staticmethod
+    # def handle_message(response):
+    #     """
+    #     converts server response to meaningful sentence
+    #     :param response: string of people names includes unknown
+    #     :return: dictionary contains sentence in result
+    #     """
+    #     unknown = 'Unknown'
+    #     persons = response.split(',')
+    #     unk_count = sum([x.split(' ').count(unknown) for i, x in enumerate(persons)])
+    #
+    #     # remove Unknown
+    #     persons = [x for i, x in enumerate(persons) if x.split(' ')[0] != unknown]
+    #     for idx, person in enumerate(persons):
+    #         person = person.split(' ')
+    #         persons[idx] = person[0].replace('_', ' ').title()
+    #         persons[idx] += ' . '
+    #         # persons[idx] += ' With probability of {} Percent . '.format(person[1])
+    #
+    #     if unk_count > 0:
+    #         persons.append(str(unk_count) + ' Unknown persons . ')
+    #
+    #     persons_count = len(persons)
+    #     phrase = ''
+    #     for i in range(persons_count):
+    #         phrase += persons[i]
+    #         phrase += ' and ' if i == persons_count - 2 and persons_count > 1 else ''
+    #     return {'result': phrase}
 
     def stop(self):
         super(FaceRecognizerSkill, self).shutdown()
