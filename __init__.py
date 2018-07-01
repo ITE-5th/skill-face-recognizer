@@ -17,7 +17,7 @@ from .default_config import DefaultConfig
 
 # TODO: Make sure "." before module name is not missing
 
-LOG.warning('Running Skill Question Answering On Python ' + sys.version)
+LOG.warning('Running Skill Face Recognizer On Python ' + sys.version)
 
 try:
     import picamera
