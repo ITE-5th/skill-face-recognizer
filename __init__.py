@@ -1,12 +1,16 @@
 # File Path Manager
 # import os
 # sys.path.append(os.path.dirname(os.path.dirname(os.path.dirname(__file__))))
+import socket
 import sys
+import traceback
 
 from adapt.intent import IntentBuilder
 from mycroft import MycroftSkill, intent_handler
 from mycroft.util.log import LOG
 
+from .code.message.face_recognition_message import FaceRecognitionMessage
+from .code.misc.camera import Camera
 # TODO: Make sure "." before module name is not missing
 # from .code.message.add_person_message import AddPersonMessage
 # from .code.message.face_recognition_message import FaceRecognitionMessage
@@ -16,7 +20,9 @@ from mycroft.util.log import LOG
 # from .code.misc.receiver import Receiver
 # from .code.misc.sender import Sender
 # from .default_config import DefaultConfig
-
+from .code.misc.receiver import Receiver
+from .code.misc.sender import Sender
+from .default_config import DefaultConfig
 
 LOG.warning('Running Skill Face Recognizer On Python ' + sys.version)
 
@@ -35,77 +41,78 @@ class FaceRecognizerSkill(MycroftSkill):
         super(FaceRecognizerSkill, self).__init__(name="FaceRecognizerSkill")
         LOG.warning('Running Skill Face Recognizer')
 
-        # if "server_url" not in self.settings:
-        #     self.settings["server_url"] = DefaultConfig.server_url
-        # self.name = None
-        # self.socket = None
-        # self.receiver = None
-        # self.sender = None
-        # self.port = None
-        # self.host = None
-        # self.camera = Camera(width=800, height=600)
-        # self.connection_type = DefaultConfig.connection_type
-        # self.registered = False
-        # self.new_person = None
+        if "server_url" not in self.settings:
+            self.settings["server_url"] = DefaultConfig.server_url
+        self.name = None
+        self.socket = None
+        self.receiver = None
+        self.sender = None
+        self.port = None
+        self.host = None
+        self.camera = Camera(width=800, height=600)
+        self.connection_type = DefaultConfig.connection_type
+        self.registered = False
+        self.new_person = None
         # self.connect()
 
     @intent_handler(IntentBuilder("RecognizeIntent").require('Face'))
     def handle_recognize_intent(self):
-        # try:
-        #     image, _ = self.camera.take_image()
-        #     msg = FaceRecognitionMessage(image=image)
-        #     sent = self.ensure_send(msg)
-        #     if not sent:
-        #         self.speak_dialog('RegisterError')
-        #         return False
-        #
-        #     response = self.receiver.receive()
-        #     LOG.info(response)
-        #     result = self.handle_message(response.get('result'))
-        #     self.speak_dialog("result", result)
-        #
-        # except Exception as e:
-        #     LOG.info('Something is wrong')
-        #     LOG.info(str(e))
-        #     LOG.info(str(traceback.format_exc()))
-        #     self.speak("Exception")
-        #     self.connect()
-        #     return False
+        try:
+            image, _ = self.camera.take_image()
+            msg = FaceRecognitionMessage(image=image)
+            sent = self.ensure_send(msg)
+            if not sent:
+                self.speak_dialog('RegisterError')
+                return False
+
+            response = self.receiver.receive()
+            LOG.info(response)
+            result = self.handle_message(response.get('result'))
+            self.speak_dialog("result", result)
+
+        except Exception as e:
+            LOG.info('Something is wrong')
+            LOG.info(str(e))
+            LOG.info(str(traceback.format_exc()))
+            self.speak("Exception")
+            self.connect()
+            return False
         LOG.info('recognize')
         return True
 
     #
-    # def connect(self):
-    #     try:
-    #         self.connection_type = self.settings.get("connection_type", DefaultConfig.connection_type)
-    #         self.host = self.settings.get("server_url", DefaultConfig.server_url)
-    #         # LOG.info('settings server : ' + self.settings.get("server_url"))
-    #         self.host = DefaultConfig.server_url
-    #         self.port = DefaultConfig.FACE_RECOGNITION_PORT
-    #         if self.connection_type == 'socket':
-    #             self.socket = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
-    #             LOG.info('connecting to server:' + self.host + ' : ' + str(self.port))
-    #             self.socket.connect((self.host, self.port))
-    #             self.receiver = Receiver(self.socket, json=True)
-    #             self.sender = Sender(self.socket, json=True)
-    #             #
-    #             LOG.info('connected to server:' + self.host + ' : ' + str(self.port))
-    #
-    #     except Exception as e:
-    #         LOG.warning(str(e))
-    #
-    # def send_recv(self, msg, user_name=DefaultConfig.name, target_name=None):
-    #     if self.connection_type == 'http':
-    #         url, method = get_http_request_type(msg, user_name, target_name)
-    #         url = self.host + url
-    #         return request_http(url, method, msg)
-    #     else:
-    #         sent = self.ensure_send(msg)
-    #         if not sent:
-    #             return None
-    #         result = self.receiver.receive()
-    #         return result
-    #
+    def connect(self):
+        try:
+            self.connection_type = self.settings.get("connection_type", DefaultConfig.connection_type)
+            self.host = self.settings.get("server_url", DefaultConfig.server_url)
+            # LOG.info('settings server : ' + self.settings.get("server_url"))
+            self.host = DefaultConfig.server_url
+            self.port = DefaultConfig.FACE_RECOGNITION_PORT
+            if self.connection_type == 'socket':
+                self.socket = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
+                LOG.info('connecting to server:' + self.host + ' : ' + str(self.port))
+                self.socket.connect((self.host, self.port))
+                self.receiver = Receiver(self.socket, json=True)
+                self.sender = Sender(self.socket, json=True)
+                #
+                LOG.info('connected to server:' + self.host + ' : ' + str(self.port))
+
+        except Exception as e:
+            LOG.warning(str(e))
+
+    def send_recv(self, msg, user_name=DefaultConfig.name, target_name=None):
+        if self.connection_type == 'http':
+            pass
+            # url, method = get_http_request_type(msg, user_name, target_name)
+            # url = self.host + url
+            # return request_http(url, method, msg)
+        else:
+            sent = self.ensure_send(msg)
+            if not sent:
+                return None
+            result = self.receiver.receive()
+            return result
+
     # def register_face(self):
     #     LOG.info("register face")
     #     if self.registered:
