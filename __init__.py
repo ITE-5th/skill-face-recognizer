@@ -13,8 +13,8 @@ from mycroft.util.log import LOG
 from .code.message.face_recognition_message import FaceRecognitionMessage
 # from .code.message.register_face_recognition_message import RegisterFaceRecognitionMessage
 from .code.misc.camera import Camera
-from .code.misc.http.api import get_http_request_type
-from .code.misc.http.api import request_http
+# from .code.misc.http.api import get_http_request_type
+# from .code.misc.http.api import request_http
 from .code.misc.receiver import Receiver
 from .code.misc.sender import Sender
 from .default_config import DefaultConfig
