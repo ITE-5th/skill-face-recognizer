@@ -1,9 +1,7 @@
 # File Path Manager
 # import os
 # sys.path.append(os.path.dirname(os.path.dirname(os.path.dirname(__file__))))
-import socket
 import sys
-import traceback
 
 from adapt.intent import IntentBuilder
 from mycroft import MycroftSkill, intent_handler
@@ -50,6 +48,32 @@ class FaceRecognizerSkill(MycroftSkill):
         self.registered = False
         self.new_person = None
         # self.connect()
+
+    @intent_handler(IntentBuilder("RecognizeIntent").require('face'))
+    def handle_recognize_intent(self):
+        # try:
+        #     image, _ = self.camera.take_image()
+        #     msg = FaceRecognitionMessage(image=image)
+        #     sent = self.ensure_send(msg)
+        #     if not sent:
+        #         self.speak_dialog('RegisterError')
+        #         return False
+        #
+        #     response = self.receiver.receive()
+        #     LOG.info(response)
+        #     result = self.handle_message(response.get('result'))
+        #     self.speak_dialog("result", result)
+        #
+        # except Exception as e:
+        #     LOG.info('Something is wrong')
+        #     LOG.info(str(e))
+        #     LOG.info(str(traceback.format_exc()))
+        #     self.speak("Exception")
+        #     self.connect()
+        #     return False
+        LOG.info('recognize')
+        return True
+
     #
     # def connect(self):
     #     try:
@@ -115,31 +139,6 @@ class FaceRecognizerSkill(MycroftSkill):
     #             self.connect()
     #             LOG.warning(str(e))
     #     return True
-
-    @intent_handler(IntentBuilder("RecognizeIntent").require('face'))
-    def handle_recognize_intent(self):
-        # try:
-        #     image, _ = self.camera.take_image()
-        #     msg = FaceRecognitionMessage(image=image)
-        #     sent = self.ensure_send(msg)
-        #     if not sent:
-        #         self.speak_dialog('RegisterError')
-        #         return False
-        #
-        #     response = self.receiver.receive()
-        #     LOG.info(response)
-        #     result = self.handle_message(response.get('result'))
-        #     self.speak_dialog("result", result)
-        #
-        # except Exception as e:
-        #     LOG.info('Something is wrong')
-        #     LOG.info(str(e))
-        #     LOG.info(str(traceback.format_exc()))
-        #     self.speak("Exception")
-        #     self.connect()
-        #     return False
-        LOG.info('recognize')
-        return True
 
     # @intent_handler(IntentBuilder("FaceIntent").require('add').require('name'))
     # def add(self, message):
