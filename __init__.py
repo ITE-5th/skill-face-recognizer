@@ -35,7 +35,7 @@ class FaceRecognizerSkill(MycroftSkill):
         LOG.warning('Running Skill Face Recognizer')
 
         if "server_url" not in self.settings:
-            self.settings["server_url"] = "192.168.43.243"
+            self.settings["server_url"] = DefaultConfig.server_url
         self.socket = None
         self.receiver = None
         self.sender = None
