@@ -101,6 +101,7 @@ class FaceRecognizerSkill(MycroftSkill):
         while retries > 0:
             try:
                 retries -= 1
+                LOG.warning(msg._type)
                 self.sender.send(msg)
                 break
             except Exception as e:

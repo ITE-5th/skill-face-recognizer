@@ -19,6 +19,7 @@ class Sender:
     def send_json(self, data):
         # try:
         # sending dictionary of object
+
         serialized = json.dumps(data.__dict__)
 
         # except (TypeError, ValueError) as e:
