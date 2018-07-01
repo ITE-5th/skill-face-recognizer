@@ -48,11 +48,6 @@ class FaceRecognizerSkill(MycroftSkill):
         # self.new_person = None
         # self.connect()
 
-    def initialize(self):
-        LOG.info('initializer')
-        # recognize_intent = IntentBuilder("FaceRecognizerIntent").require("TEMP").build()
-        # self.register_intent(recognize_intent, self.handle_recognize_intent)
-
     # def connect(self):
     #     try:
     #         self.connection_type = self.settings.get("connection_type", DefaultConfig.connection_type)
@@ -118,7 +113,7 @@ class FaceRecognizerSkill(MycroftSkill):
     #             LOG.warning(str(e))
     #     return True
 
-    @intent_handler(IntentBuilder("RecognizeIntent").require('Ahmed'))
+    @intent_handler(IntentBuilder("RecognizeIntent").require('face'))
     def handle_recognize_intent(self):
         # try:
         #     image, _ = self.camera.take_image()
