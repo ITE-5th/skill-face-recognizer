@@ -1,13 +1,11 @@
-# File Path Manager
-# import os
-# sys.path.append(os.path.dirname(os.path.dirname(os.path.dirname(__file__))))
+import sys
 
 from adapt.intent import IntentBuilder
 from mycroft import MycroftSkill, intent_handler
 from mycroft.util.log import LOG
 
-from .code.message.face_recognition_message import FaceRecognitionMessage
-from .code.misc.camera import Camera
+# from .code.message.face_recognition_message import FaceRecognitionMessage
+# from .code.misc.camera import Camera
 # TODO: Make sure "." before module name is not missing
 # from .code.message.add_person_message import AddPersonMessage
 # from .code.message.face_recognition_message import FaceRecognitionMessage
@@ -46,7 +44,7 @@ class FaceRecognizerSkill(MycroftSkill):
         self.sender = None
         self.port = None
         self.host = None
-        self.camera = Camera(width=800, height=600)
+        # self.camera = Camera(width=800, height=600)
         # self.connection_type = DefaultConfig.connection_type
         self.registered = False
         self.new_person = None
