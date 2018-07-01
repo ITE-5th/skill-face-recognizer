@@ -117,7 +117,7 @@ class FaceRecognizerSkill(MycroftSkill):
     #             LOG.warning(str(e))
     #     return True
 
-    def handle_recognize_intent(self, message):
+    def handle_recognize_intent(self):
         # try:
         #     image, _ = self.camera.take_image()
         #     msg = FaceRecognitionMessage(image=image)
@@ -139,7 +139,6 @@ class FaceRecognizerSkill(MycroftSkill):
         #     self.connect()
         #     return False
         LOG.info('recognize')
-
         return True
 
     # @intent_handler(IntentBuilder("FaceIntent").require('add').require('name'))
@@ -212,8 +211,8 @@ class FaceRecognizerSkill(MycroftSkill):
     def stop(self):
         super(FaceRecognizerSkill, self).shutdown()
         LOG.info("Face Recognizer Skill CLOSED")
-        if self.socket:
-            self.socket.close()
+        # if self.socket:
+        #     self.socket.close()
 
 
 def create_skill():
