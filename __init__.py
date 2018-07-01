@@ -6,23 +6,10 @@ from adapt.intent import IntentBuilder
 from mycroft import MycroftSkill, intent_handler
 from mycroft.util.log import LOG
 
-# from .code.message.face_recognition_message import FaceRecognitionMessage
-# from .code.misc.camera import Camera
-# TODO: Make sure "." before module name is not missing
-# from .code.message.add_person_message import AddPersonMessage
-# from .code.message.face_recognition_message import FaceRecognitionMessage
-# from .code.message.register_face_recognition_message import RegisterFaceRecognitionMessage
-# from .code.misc.camera import Camera
-# from .code.misc.http.api import get_http_request_type, request_http
-# from .code.misc.receiver import Receiver
-# from .code.misc.sender import Sender
-# from .default_config import DefaultConfig
-# from .code.misc.receiver import Receiver
-# from .code.misc.sender import Sender
-# from .default_config import DefaultConfig
 from .code.message.add_person_message import AddPersonMessage
 from .code.message.face_recognition_message import FaceRecognitionMessage
-from .code.message.register_face_recognition_message import RegisterFaceRecognitionMessage
+# TODO: Make sure "." before module name is not missing
+from .code.message.start_face_recognition_message import StartFaceRecognitionMessage
 from .code.misc.camera import Camera
 from .code.misc.http.api import get_http_request_type, request_http
 from .code.misc.receiver import Receiver
@@ -98,7 +85,7 @@ class FaceRecognizerSkill(MycroftSkill):
 
         self.u_name = self.settings.get('name', DefaultConfig.u_name)
 
-        msg = RegisterFaceRecognitionMessage(self.u_name)
+        msg = StartFaceRecognitionMessage(self.u_name)
         result = self.send_recv(msg)
         if not result:
             self.speak_dialog('RegisterError')
@@ -128,7 +115,10 @@ class FaceRecognizerSkill(MycroftSkill):
     @intent_handler(IntentBuilder("RecognizeIntent").require('Face'))
     def handle_recognize_intent(self):
         try:
-            LOG.info('test')
+            if not self.registered:
+                registered = self.register_face()
+                if not registered:
+                    return False
             image, _ = self.camera.take_image()
             msg = FaceRecognitionMessage(image=image)
             sent = self.ensure_send(msg)
