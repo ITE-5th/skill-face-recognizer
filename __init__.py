@@ -92,7 +92,7 @@ class FaceRecognizerSkill(MycroftSkill):
             return False
 
         LOG.info(result)
-        self.speak_dialog("AddResult", self.new_person)
+        self.speak_dialog("AddResult", {'p_name': self.u_name})
         self.registered = True
         return True
 
