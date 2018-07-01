@@ -3,14 +3,12 @@
 # sys.path.append(os.path.dirname(os.path.dirname(os.path.dirname(__file__))))
 import socket
 import sys
-import traceback
 
 from adapt.intent import IntentBuilder
 from mycroft import MycroftSkill
 from mycroft.util.log import LOG
 
 # from .code.message.add_person_message import AddPersonMessage
-from .code.message.face_recognition_message import FaceRecognitionMessage
 # from .code.message.register_face_recognition_message import RegisterFaceRecognitionMessage
 from .code.misc.camera import Camera
 # from .code.misc.http.api import get_http_request_type
@@ -123,26 +121,28 @@ class FaceRecognizerSkill(MycroftSkill):
         return True
 
     def handle_recognize_intent(self, message):
-        try:
-            image, _ = self.camera.take_image()
-            msg = FaceRecognitionMessage(image=image)
-            sent = self.ensure_send(msg)
-            if not sent:
-                self.speak_dialog('RegisterError')
-                return False
+        # try:
+        #     image, _ = self.camera.take_image()
+        #     msg = FaceRecognitionMessage(image=image)
+        #     sent = self.ensure_send(msg)
+        #     if not sent:
+        #         self.speak_dialog('RegisterError')
+        #         return False
+        #
+        #     response = self.receiver.receive()
+        #     LOG.info(response)
+        #     result = self.handle_message(response.get('result'))
+        #     self.speak_dialog("result", result)
+        #
+        # except Exception as e:
+        #     LOG.info('Something is wrong')
+        #     LOG.info(str(e))
+        #     LOG.info(str(traceback.format_exc()))
+        #     self.speak("Exception")
+        #     self.connect()
+        #     return False
+        LOG.info('recognize')
 
-            response = self.receiver.receive()
-            LOG.info(response)
-            result = self.handle_message(response.get('result'))
-            self.speak_dialog("result", result)
-
-        except Exception as e:
-            LOG.info('Something is wrong')
-            LOG.info(str(e))
-            LOG.info(str(traceback.format_exc()))
-            self.speak("Exception")
-            self.connect()
-            return False
         return True
 
     # @intent_handler(IntentBuilder("FaceIntent").require('add').require('name'))
