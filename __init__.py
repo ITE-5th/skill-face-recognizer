@@ -38,16 +38,16 @@ class FaceRecognizerSkill(MycroftSkill):
 
         # if "server_url" not in self.settings:
         #     self.settings["server_url"] = DefaultConfig.server_url
-        self.name = None
-        self.socket = None
-        self.receiver = None
-        self.sender = None
-        self.port = None
-        self.host = None
+        # self.name = None
+        # self.socket = None
+        # self.receiver = None
+        # self.sender = None
+        # self.port = None
+        # self.host = None
         # self.camera = Camera(width=800, height=600)
         # self.connection_type = DefaultConfig.connection_type
-        self.registered = False
-        self.new_person = None
+        # self.registered = False
+        # self.new_person = None
         # self.connect()
 
     @intent_handler(IntentBuilder("RecognizeIntent").require('Face'))
