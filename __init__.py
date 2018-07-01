@@ -9,10 +9,10 @@ from mycroft.util.log import LOG
 
 # from .code.message.add_person_message import AddPersonMessage
 # from .code.message.register_face_recognition_message import RegisterFaceRecognitionMessage
-from .code.misc.camera import Camera
+# from .code.misc.camera import Camera
 # from .code.misc.http.api import get_http_request_type
 # from .code.misc.http.api import request_http
-from .default_config import DefaultConfig
+# from .default_config import DefaultConfig
 
 # TODO: Make sure "." before module name is not missing
 
@@ -33,16 +33,16 @@ class FaceRecognizerSkill(MycroftSkill):
         super(FaceRecognizerSkill, self).__init__("FaceRecognizerSkill")
         LOG.warning('Running Skill Face Recognizer')
 
-        if "server_url" not in self.settings:
-            self.settings["server_url"] = DefaultConfig.server_url
+        # if "server_url" not in self.settings:
+        #     self.settings["server_url"] = DefaultConfig.server_url
         self.name = None
         self.socket = None
         self.receiver = None
         self.sender = None
         self.port = None
         self.host = None
-        self.camera = Camera(width=800, height=600)
-        self.connection_type = DefaultConfig.connection_type
+        # self.camera = Camera(width=800, height=600)
+        # self.connection_type = DefaultConfig.connection_type
         self.registered = False
         self.new_person = None
         # self.connect()
