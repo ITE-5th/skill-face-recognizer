@@ -75,7 +75,6 @@ class FaceRecognizerSkill(MycroftSkill):
         LOG.info('recognize')
         return True
 
-
     # def connect(self):
     #     try:
     #         self.connection_type = self.settings.get("connection_type", DefaultConfig.connection_type)
