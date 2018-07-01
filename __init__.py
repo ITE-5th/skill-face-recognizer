@@ -6,7 +6,7 @@ import sys
 import traceback
 
 from adapt.intent import IntentBuilder
-from mycroft import MycroftSkill, intent_handler
+from mycroft import MycroftSkill
 from mycroft.util.log import LOG
 
 # from .code.message.add_person_message import AddPersonMessage
@@ -51,6 +51,11 @@ class FaceRecognizerSkill(MycroftSkill):
         self.registered = False
         self.new_person = None
         self.connect()
+
+    def initialize(self):
+        LOG.info('initialize')
+        recognize_intent = IntentBuilder("FaceRecognizerIntent").require("Face").build()
+        self.register_intent(recognize_intent, self.handle_recognize_intent)
 
     def connect(self):
         try:
@@ -117,8 +122,7 @@ class FaceRecognizerSkill(MycroftSkill):
                 LOG.warning(str(e))
         return True
 
-    @intent_handler(IntentBuilder("FaceRecognizerIntent").require('face').build())
-    def recognise(self, message):
+    def handle_recognize_intent(self, message):
         try:
             image, _ = self.camera.take_image()
             msg = FaceRecognitionMessage(image=image)
