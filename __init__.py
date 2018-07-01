@@ -55,36 +55,36 @@ class FaceRecognizerSkill(MycroftSkill):
         recognize_intent = IntentBuilder("FaceRecognizerIntent").require("Face").build()
         self.register_intent(recognize_intent, self.handle_recognize_intent)
 
-    def connect(self):
-        try:
-            self.connection_type = self.settings.get("connection_type", DefaultConfig.connection_type)
-            self.host = self.settings.get("server_url", DefaultConfig.server_url)
-            # LOG.info('settings server : ' + self.settings.get("server_url"))
-            self.host = DefaultConfig.server_url
-            self.port = DefaultConfig.FACE_RECOGNITION_PORT
-            if self.connection_type == 'socket':
-                self.socket = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
-                LOG.info('connecting to server:' + self.host + ' : ' + str(self.port))
-                self.socket.connect((self.host, self.port))
-                self.receiver = Receiver(self.socket, json=True)
-                self.sender = Sender(self.socket, json=True)
-                #
-                LOG.info('connected to server:' + self.host + ' : ' + str(self.port))
-
-        except Exception as e:
-            LOG.warning(str(e))
-
-    def send_recv(self, msg, user_name=DefaultConfig.name, target_name=None):
-        if self.connection_type == 'http':
-            url, method = get_http_request_type(msg, user_name, target_name)
-            url = self.host + url
-            return request_http(url, method, msg)
-        else:
-            sent = self.ensure_send(msg)
-            if not sent:
-                return None
-            result = self.receiver.receive()
-            return result
+    # def connect(self):
+    #     try:
+    #         self.connection_type = self.settings.get("connection_type", DefaultConfig.connection_type)
+    #         self.host = self.settings.get("server_url", DefaultConfig.server_url)
+    #         # LOG.info('settings server : ' + self.settings.get("server_url"))
+    #         self.host = DefaultConfig.server_url
+    #         self.port = DefaultConfig.FACE_RECOGNITION_PORT
+    #         if self.connection_type == 'socket':
+    #             self.socket = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
+    #             LOG.info('connecting to server:' + self.host + ' : ' + str(self.port))
+    #             self.socket.connect((self.host, self.port))
+    #             self.receiver = Receiver(self.socket, json=True)
+    #             self.sender = Sender(self.socket, json=True)
+    #             #
+    #             LOG.info('connected to server:' + self.host + ' : ' + str(self.port))
+    #
+    #     except Exception as e:
+    #         LOG.warning(str(e))
+    #
+    # def send_recv(self, msg, user_name=DefaultConfig.name, target_name=None):
+    #     if self.connection_type == 'http':
+    #         url, method = get_http_request_type(msg, user_name, target_name)
+    #         url = self.host + url
+    #         return request_http(url, method, msg)
+    #     else:
+    #         sent = self.ensure_send(msg)
+    #         if not sent:
+    #             return None
+    #         result = self.receiver.receive()
+    #         return result
 
     # def register_face(self):
     #     LOG.info("register face")
@@ -104,21 +104,21 @@ class FaceRecognizerSkill(MycroftSkill):
     #     self.registered = True
     #     return True
     #
-    def ensure_send(self, msg):
-        retries = 3
-        while retries > 0:
-            try:
-                retries -= 1
-                self.sender.send(msg)
-                break
-            except Exception as e:
-                if retries <= 0:
-                    LOG.warning('Cannot Connect')
-                    self.speak('Cannot Connect')
-                    return False
-                self.connect()
-                LOG.warning(str(e))
-        return True
+    # def ensure_send(self, msg):
+    #     retries = 3
+    #     while retries > 0:
+    #         try:
+    #             retries -= 1
+    #             self.sender.send(msg)
+    #             break
+    #         except Exception as e:
+    #             if retries <= 0:
+    #                 LOG.warning('Cannot Connect')
+    #                 self.speak('Cannot Connect')
+    #                 return False
+    #             self.connect()
+    #             LOG.warning(str(e))
+    #     return True
 
     def handle_recognize_intent(self, message):
         # try:
