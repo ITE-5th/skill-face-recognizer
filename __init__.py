@@ -79,7 +79,7 @@ class FaceRecognizerSkill(MycroftSkill):
         except Exception as e:
             LOG.warning(str(e))
 
-    def send_recv(self, msg, user_name=DefaultConfig.name, target_name=None):
+    def send_recv(self, msg, user_name=DefaultConfig.u_name, target_name=None):
         if self.connection_type == 'http':
             url, method = get_http_request_type(msg, user_name, target_name)
             url = self.host + url
