@@ -1,9 +1,6 @@
 # File Path Manager
 # import os
 # sys.path.append(os.path.dirname(os.path.dirname(os.path.dirname(__file__))))
-import socket
-import sys
-# import traceback
 
 from adapt.intent import IntentBuilder
 from mycroft import MycroftSkill, intent_handler
@@ -20,8 +17,8 @@ from .code.misc.camera import Camera
 # from .code.misc.receiver import Receiver
 # from .code.misc.sender import Sender
 # from .default_config import DefaultConfig
-from .code.misc.receiver import Receiver
-from .code.misc.sender import Sender
+# from .code.misc.receiver import Receiver
+# from .code.misc.sender import Sender
 # from .default_config import DefaultConfig
 
 LOG.warning('Running Skill Face Recognizer On Python ' + sys.version)
@@ -41,8 +38,8 @@ class FaceRecognizerSkill(MycroftSkill):
         super(FaceRecognizerSkill, self).__init__(name="FaceRecognizerSkill")
         LOG.warning('Running Skill Face Recognizer')
 
-        if "server_url" not in self.settings:
-            self.settings["server_url"] = DefaultConfig.server_url
+        # if "server_url" not in self.settings:
+        #     self.settings["server_url"] = DefaultConfig.server_url
         self.name = None
         self.socket = None
         self.receiver = None
