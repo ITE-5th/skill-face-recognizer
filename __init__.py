@@ -50,6 +50,7 @@ class FaceRecognizerSkill(MycroftSkill):
         self.connection_type = DefaultConfig.connection_type
         self.registered = False
         self.new_person = None
+        self.connect()
 
     def connect(self):
         try:
