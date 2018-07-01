@@ -49,7 +49,7 @@ class FaceRecognizerSkill(MycroftSkill):
         self.new_person = None
         # self.connect()
 
-    @intent_handler(IntentBuilder("RecognizeIntent").require('Face'))
+    @intent_handler(IntentBuilder("RecognizeIntent").require('Facer'))
     def handle_recognize_intent(self):
         # try:
         #     image, _ = self.camera.take_image()
