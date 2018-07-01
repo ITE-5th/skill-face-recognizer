@@ -1,0 +1,4 @@
+requests
+dlib
+msm
+picamera
