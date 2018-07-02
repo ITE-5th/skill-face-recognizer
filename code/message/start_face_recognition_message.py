@@ -1,5 +1,5 @@
-from .name_message import NameMessage
+from .message import Message
 
 
-class StartFaceRecognitionMessage(NameMessage):
+class StartFaceRecognitionMessage(Message):
     pass
