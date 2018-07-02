@@ -6,11 +6,11 @@ from adapt.intent import IntentBuilder
 from mycroft import MycroftSkill, intent_handler
 from mycroft.util.log import LOG
 
-from code.message.end_add_person_message import EndAddPersonMessage
-from code.message.register_face_recognition_message import RegisterFaceRecognitionMessage
-from .code.message.add_person_message import AddPersonMessage
-from .code.message.face_recognition_message import FaceRecognitionMessage
 # TODO: Make sure "." before module name is not missing
+from .code.message.add_person_message import AddPersonMessage
+from .code.message.end_add_person_message import EndAddPersonMessage
+from .code.message.face_recognition_message import FaceRecognitionMessage
+from .code.message.remove_person_message import RemovePersonMessage
 from .code.message.start_face_recognition_message import StartFaceRecognitionMessage
 from .code.misc.camera import Camera
 from .code.misc.http.api import get_http_request_type, request_http
@@ -158,7 +158,23 @@ class FaceRecognizerSkill(MycroftSkill):
         if not self.is_registered():
             return False
         LOG.info(message.data)
-        self.new_person = message.data.get('name')
+        self.new_person = message.data.get('p_name')
+        return True
+
+    @intent_handler(IntentBuilder("FaceIntent").require('Remove').require('p_name'))
+    def remove(self, message):
+        if not self.is_registered():
+            return False
+        LOG.info(message.data)
+        person_name = message.data.get('p_name')
+        msg = RemovePersonMessage(person_name)
+        result = self.send_recv(msg)
+        if not result or result.get('result', DefaultConfig.ERROR) == DefaultConfig.ERROR:
+            self.speak_dialog("RemoveError", {'p_name': self.user_name})
+            return True
+        LOG.info(result)
+        self.speak_dialog("RemoveSuccess", {'p_name': self.user_name})
+
         return True
 
     @intent_handler(IntentBuilder("FaceIntent").require('Capture'))
