@@ -141,7 +141,6 @@ class FaceRecognizerSkill(MycroftSkill):
             self.speak("Exception")
             self.connect()
             return False
-        LOG.info('recognize')
         return True
 
     @intent_handler(IntentBuilder("FaceIntent").require('Add').require('p_name'))
