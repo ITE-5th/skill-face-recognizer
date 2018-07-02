@@ -97,6 +97,8 @@ class FaceRecognizerSkill(MycroftSkill):
     def handle_recognize_intent(self):
         try:
             image, _ = self.camera.take_image()
+            LOG.warning(str(image))
+            LOG.warning(str(self.user_name))
             msg = FaceRecognitionMessage(image, self.user_name)
             sent = self.ensure_send(msg)
             if not sent:
