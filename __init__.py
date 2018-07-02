@@ -97,7 +97,7 @@ class FaceRecognizerSkill(MycroftSkill):
     def handle_recognize_intent(self):
         try:
             image, _ = self.camera.take_image()
-            msg = FaceRecognitionMessage(image=image, user_name=self.user_name)
+            msg = FaceRecognitionMessage(image, self.user_name)
             sent = self.ensure_send(msg)
             if not sent:
                 self.speak_dialog('ConnectionError')
@@ -131,7 +131,7 @@ class FaceRecognizerSkill(MycroftSkill):
     def remove(self, message):
         LOG.info(message.data)
         person_name = message.data.get('p_name')
-        msg = RemovePersonMessage(name=person_name, user_name=self.user_name)
+        msg = RemovePersonMessage(person_name, self.user_name)
         result = self.send_recv(msg)
         if not result or result.get('result', DefaultConfig.ERROR) == DefaultConfig.ERROR:
             self.speak_dialog("RemoveError", {'p_name': self.user_name})
@@ -150,7 +150,7 @@ class FaceRecognizerSkill(MycroftSkill):
         if image is None:
             self.speak_dialog("PersonCountError")
             return True
-        msg = AddPersonMessage(image=image, user_name=self.user_name)
+        msg = AddPersonMessage(image, self.user_name)
         result = self.send_recv(msg)
         if not result or result.get('result', DefaultConfig.ERROR) == DefaultConfig.ERROR:
             self.speak_dialog("AddError", {'p_name': self.user_name})
@@ -161,7 +161,7 @@ class FaceRecognizerSkill(MycroftSkill):
         self.images_count += self.images_count
         # END ADD
         if self.images_count > DefaultConfig.MaxImagesCount:
-            msg = EndAddPersonMessage(name=self.new_person, user_name=self.user_name)
+            msg = EndAddPersonMessage(self.new_person, self.user_name)
             result = self.send_recv(msg)
             if not result:
                 self.speak_dialog("EndAddError", {'p_name': self.user_name})
