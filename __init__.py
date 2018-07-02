@@ -91,11 +91,6 @@ class FaceRecognizerSkill(MycroftSkill):
             return True
 
         self.user_name = self.settings.get('user_name', DefaultConfig.user_name)
-        # REGISTER FACE
-        msg = RegisterFaceRecognitionMessage(self.user_name)
-        result = self.send_recv(msg)
-        if has_error(result):
-            return False
         # START FACE MESSAGE
         msg = StartFaceRecognitionMessage(self.user_name)
         result = self.send_recv(msg)
