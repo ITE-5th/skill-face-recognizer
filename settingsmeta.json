@@ -8,8 +8,8 @@
           {
             "name": "user_name",
             "type": "text",
-            "label": "user name",
-            "value": "guest"
+            "label": "user name:",
+            "value": "zaher"
           },
           {
             "name": "connection_type",
