@@ -188,6 +188,7 @@ class FaceRecognizerSkill(MycroftSkill):
         self.speak_dialog("AddSuccess", {'p_name': self.user_name})
 
         self.images_count += self.images_count
+        # END ADD
         if self.images_count > DefaultConfig.MaxImagesCount:
             msg = EndAddPersonMessage(self.new_person)
             result = self.send_recv(msg)
