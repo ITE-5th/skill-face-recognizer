@@ -133,7 +133,6 @@ class FaceRecognizerSkill(MycroftSkill):
                 return True
             result = self.handle_message(recognise_result)
             self.speak_dialog("RecogniseResult", result)
-            return True
 
         except Exception as e:
             LOG.info('Something is wrong')
