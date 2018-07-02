@@ -1,5 +1,6 @@
 class DefaultConfig:
-    u_name = 'zaher'
+    ERROR = 'error'
+    user_name = 'zaher'
     server_url = '192.168.1.11'
     connection_type = 'socket'
     MaxImagesCount = 5

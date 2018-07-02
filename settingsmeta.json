@@ -6,7 +6,7 @@
         "name": "User Setup",
         "fields": [
           {
-            "name": "name",
+            "name": "user_name",
             "type": "text",
             "label": "user name",
             "value": "guest"

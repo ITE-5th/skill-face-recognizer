@@ -6,6 +6,8 @@ from adapt.intent import IntentBuilder
 from mycroft import MycroftSkill, intent_handler
 from mycroft.util.log import LOG
 
+from code.message.end_add_person_message import EndAddPersonMessage
+from code.message.register_face_recognition_message import RegisterFaceRecognitionMessage
 from .code.message.add_person_message import AddPersonMessage
 from .code.message.face_recognition_message import FaceRecognitionMessage
 # TODO: Make sure "." before module name is not missing
@@ -35,7 +37,7 @@ class FaceRecognizerSkill(MycroftSkill):
 
         if "server_url" not in self.settings:
             self.settings["server_url"] = DefaultConfig.server_url
-        self.u_name = None
+        self.user_name = None
         self.socket = None
         self.receiver = None
         self.sender = None
@@ -66,7 +68,7 @@ class FaceRecognizerSkill(MycroftSkill):
         except Exception as e:
             LOG.warning(str(e))
 
-    def send_recv(self, msg, user_name=DefaultConfig.u_name, target_name=None):
+    def send_recv(self, msg, user_name=DefaultConfig.user_name, target_name=None):
         if self.connection_type == 'http':
             url, method = get_http_request_type(msg, user_name, target_name)
             url = self.host + url
@@ -79,20 +81,30 @@ class FaceRecognizerSkill(MycroftSkill):
             return result
 
     def register_face(self):
+        def has_error(message):
+            if not message or message.get('result', DefaultConfig.ERROR) == DefaultConfig.ERROR:
+                self.speak_dialog('RegisterError', {'user_name': self.user_name})
+                return False
+
         LOG.info("register face")
         if self.registered:
             return True
 
-        self.u_name = self.settings.get('name', DefaultConfig.u_name)
-
-        msg = StartFaceRecognitionMessage(self.u_name)
+        self.user_name = self.settings.get('user_name', DefaultConfig.user_name)
+        # REGISTER FACE
+        msg = RegisterFaceRecognitionMessage(self.user_name)
         result = self.send_recv(msg)
-        if not result:
-            self.speak_dialog('RegisterError')
+        if has_error(result):
+            return False
+        # START FACE MESSAGE
+        msg = StartFaceRecognitionMessage(self.user_name)
+        result = self.send_recv(msg)
+
+        if has_error(result):
             return False
 
         LOG.info(result)
-        self.speak_dialog("AddResult", {'p_name': self.u_name})
+        self.speak_dialog("RegisterSuccess", {'user_name': self.user_name})
         self.registered = True
         return True
 
@@ -101,7 +113,6 @@ class FaceRecognizerSkill(MycroftSkill):
         while retries > 0:
             try:
                 retries -= 1
-                LOG.warning(msg._type)
                 self.sender.send(msg)
                 break
             except Exception as e:
@@ -113,24 +124,29 @@ class FaceRecognizerSkill(MycroftSkill):
                 LOG.warning(str(e))
         return True
 
+    def is_registered(self):
+        if not self.registered:
+            registered = self.register_face()
+            if not registered:
+                return False
+        return True
+
     @intent_handler(IntentBuilder("RecognizeIntent").require('Face'))
     def handle_recognize_intent(self):
         try:
-            if not self.registered:
-                registered = self.register_face()
-                if not registered:
-                    return False
+            if not self.is_registered():
+                return False
             image, _ = self.camera.take_image()
             msg = FaceRecognitionMessage(image=image)
             sent = self.ensure_send(msg)
             if not sent:
-                self.speak_dialog('RegisterError')
+                self.speak_dialog('ConnectionError')
                 return False
 
             response = self.receiver.receive()
             LOG.info(response)
             result = self.handle_message(response.get('result'))
-            self.speak_dialog("Result", result)
+            self.speak_dialog("RecogniseResults", result)
 
         except Exception as e:
             LOG.info('Something is wrong')
@@ -144,10 +160,8 @@ class FaceRecognizerSkill(MycroftSkill):
 
     @intent_handler(IntentBuilder("FaceIntent").require('Add').require('p_name'))
     def add(self, message):
-        if not self.registered:
-            registered = self.register_face()
-            if not registered:
-                return False
+        if not self.is_registered():
+            return False
         LOG.info(message.data)
         self.new_person = message.data.get('name')
         return True
@@ -166,16 +180,22 @@ class FaceRecognizerSkill(MycroftSkill):
             self.speak_dialog("PersonCountError")
             return True
         msg = AddPersonMessage(image)
-        # sent = self.ensure_send(msg)
         result = self.send_recv(msg)
-        if not result:
-            return False
-        # result = self.receiver.receive()
+        if not result or result.get('result', DefaultConfig.ERROR) == DefaultConfig.ERROR:
+            self.speak_dialog("AddError", {'p_name': self.user_name})
+            return True
         LOG.info(result)
-        self.speak_dialog("AddResult", {'p_name': self.u_name})
+        self.speak_dialog("AddSuccess", {'p_name': self.user_name})
 
         self.images_count += self.images_count
         if self.images_count > DefaultConfig.MaxImagesCount:
+            msg = EndAddPersonMessage(self.new_person)
+            result = self.send_recv(msg)
+            if not result:
+                self.speak_dialog("EndAddError", {'p_name': self.user_name})
+                return True
+            LOG.info(result)
+            self.speak_dialog("EndAddSuccess", {'p_name': self.user_name})
             self.new_person = None
 
         return True
@@ -196,11 +216,11 @@ class FaceRecognizerSkill(MycroftSkill):
         for idx, person in enumerate(persons):
             person = person.split(' ')
             persons[idx] = person[0].replace('_', ' ').title()
-            persons[idx] += ' . '
+            persons[idx] += ','
             # persons[idx] += ' With probability of {} Percent . '.format(person[1])
 
         if unk_count > 0:
-            persons.append(str(unk_count) + ' Unknown persons . ')
+            persons.append(str(unk_count) + ' Unknown' + 'persons' if unk_count > 1 else 'person')
 
         persons_count = len(persons)
         phrase = ''
@@ -212,8 +232,8 @@ class FaceRecognizerSkill(MycroftSkill):
     def stop(self):
         super(FaceRecognizerSkill, self).shutdown()
         LOG.info("Face Recognizer Skill CLOSED")
-        # if self.socket:
-        #     self.socket.close()
+        if self.socket:
+            self.socket.close()
 
 
 def create_skill():
