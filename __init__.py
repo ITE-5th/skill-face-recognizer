@@ -218,7 +218,7 @@ class FaceRecognizerSkill(MycroftSkill):
             # persons[idx] += ' With probability of {} Percent . '.format(person[1])
 
         if unk_count > 0:
-            persons.append(str(unk_count) + ' Unknown' + ('persons' if unk_count > 1 else 'person'))
+            persons.append(str(unk_count) + ' Unknown ' + ('persons' if unk_count > 1 else 'person'))
 
         persons_count = len(persons)
         phrase = ''
