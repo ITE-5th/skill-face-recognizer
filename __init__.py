@@ -45,7 +45,6 @@ class FaceRecognizerSkill(MycroftSkill):
         self.host = None
         self.camera = Camera(width=800, height=600)
         self.connection_type = DefaultConfig.connection_type
-        self.registered = False
         self.new_person = None
         self.connect()
 
@@ -85,8 +84,6 @@ class FaceRecognizerSkill(MycroftSkill):
                 return False
 
         LOG.info("register face")
-        if self.registered:
-            return True
 
         self.user_name = self.settings.get('user_name', DefaultConfig.user_name)
         # START FACE MESSAGE
@@ -98,7 +95,6 @@ class FaceRecognizerSkill(MycroftSkill):
 
         LOG.info(result)
         self.speak_dialog("RegisterSuccess", {'user_name': self.user_name})
-        self.registered = True
         return True
 
     def ensure_send(self, msg):
@@ -117,17 +113,10 @@ class FaceRecognizerSkill(MycroftSkill):
                 LOG.warning(str(e))
         return True
 
-    def is_registered(self):
-        if not self.registered:
-            registered = self.register_face()
-            if not registered:
-                return False
-        return True
-
     @intent_handler(IntentBuilder("RecognizeIntent").require('Face'))
     def handle_recognize_intent(self):
         try:
-            if not self.is_registered():
+            if not self.register_face():
                 return False
             image, _ = self.camera.take_image()
             msg = FaceRecognitionMessage(image=image)
@@ -153,15 +142,13 @@ class FaceRecognizerSkill(MycroftSkill):
 
     @intent_handler(IntentBuilder("FaceIntent").require('Add').require('p_name'))
     def add(self, message):
-        if not self.is_registered():
-            return False
         LOG.info(message.data)
         self.new_person = message.data.get('p_name')
         return True
 
     @intent_handler(IntentBuilder("FaceIntent").require('Remove').require('p_name'))
     def remove(self, message):
-        if not self.is_registered():
+        if not self.register_face():
             return False
         LOG.info(message.data)
         person_name = message.data.get('p_name')
@@ -177,10 +164,8 @@ class FaceRecognizerSkill(MycroftSkill):
 
     @intent_handler(IntentBuilder("FaceIntent").require('Capture'))
     def capture(self, message):
-        if not self.registered:
-            registered = self.register_face()
-            if not registered:
-                return False
+        if not self.register_face():
+            return False
         if self.new_person is None:
             self.speak('Please add person before capture')
             return True
