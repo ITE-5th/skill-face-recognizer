@@ -123,13 +123,13 @@ class FaceRecognizerSkill(MycroftSkill):
             return False
         return True
 
-    @intent_handler(IntentBuilder("FaceIntent").require('Add').require('p_name'))
+    @intent_handler(IntentBuilder("AddFaceIntent").require('Add').require('p_name'))
     def add(self, message):
         LOG.info(message.data)
         self.new_person = message.data.get('p_name')
         return True
 
-    @intent_handler(IntentBuilder("FaceIntent").require('Remove').require('p_name'))
+    @intent_handler(IntentBuilder("RecognizeFaceIntent").require('Remove').require('p_name'))
     def remove(self, message):
         LOG.info(message.data)
         person_name = message.data.get('p_name')
@@ -143,7 +143,7 @@ class FaceRecognizerSkill(MycroftSkill):
 
         return True
 
-    @intent_handler(IntentBuilder("FaceIntent").require('Capture'))
+    @intent_handler(IntentBuilder("CaptureFaceIntent").require('Capture'))
     def capture(self, message):
         if self.new_person is None:
             self.speak('Please add person before capture')
