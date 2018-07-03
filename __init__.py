@@ -125,6 +125,28 @@ class FaceRecognizerSkill(MycroftSkill):
 
     @intent_handler(IntentBuilder("AddFaceIntent").require('Add').require('p_name'))
     def add(self, message):
+        import speech_recognition as sr
+        r = sr.Recognizer()
+        with sr.Microphone() as source:
+            print('recording...')
+
+            audio = r.listen(source)
+        print('fin recording...')
+
+        try:
+            googleSTT = r.recognize_google(audio, language='ar-AE')
+            print("Google Speech Recognition thinks you said " + googleSTT)
+            # translator = Translator()
+            # translated = translator.translate(googleSTT, dest='en')
+            # print(googleSTT)
+            # print(translated.text)
+
+        except sr.UnknownValueError:
+            print("Google Speech Recognition could not understand audio")
+        except sr.RequestError as e:
+
+            print("Could not request results from Google Speech Recognition service; {0}".format(e))
+
         LOG.info(message.data)
         self.new_person = message.data.get('p_name')
         return True
