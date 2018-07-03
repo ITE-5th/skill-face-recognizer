@@ -37,6 +37,7 @@ class Camera:
         import dlib
         import numpy
         from PIL import Image
+        print(file_name)
         print('analysing faces count')
         detector = dlib.get_frontal_face_detector()
         # from skimage import io
