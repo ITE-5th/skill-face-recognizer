@@ -42,7 +42,7 @@ class Camera:
         detector = dlib.get_frontal_face_detector()
         # from skimage import io
         # image = io.imread(file_name)
-        image = numpy.asarray(Image.open(image_file)).setflags(write=True)
+        image = numpy.asarray(Image.open(image_file))
         image.setflags(write=True)
         rects = detector(image, 1)
         has_one_face = len(rects) == faces_count
