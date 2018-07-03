@@ -42,6 +42,7 @@ class FaceRecognizerSkill(MycroftSkill):
         self.sender = None
         self.port = None
         self.host = None
+        self.images_count = 0
         self.camera = Camera(width=800, height=600)
         self.connection_type = DefaultConfig.connection_type
         self.new_person = None
@@ -169,6 +170,7 @@ class FaceRecognizerSkill(MycroftSkill):
                 self.speak_dialog("EndAddError", {'p_name': self.user_name})
                 return True
             LOG.info(result)
+            self.images_count = 0
             self.speak_dialog("EndAddSuccess", {'p_name': self.user_name})
             self.new_person = None
 
