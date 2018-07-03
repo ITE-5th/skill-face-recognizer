@@ -14,7 +14,7 @@ class Camera:
     def take_image(self, face_count=0):
         import os
 
-        temp_dir = './temp/'
+        temp_dir = '/temp/'
         if not os.path.exists(temp_dir):
             os.makedirs(temp_dir)
 
@@ -33,7 +33,7 @@ class Camera:
         #     encoded_string = base64.b64encode(image_file.read()).decode('utf-8')
         return encoded_string, file_name
 
-    def check_faces(self, file_name='./temp/Image.jpg', faces_count=1):
+    def check_faces(self, file_name='/temp/Image.jpg', faces_count=1):
         import dlib
         import numpy
         from PIL import Image
