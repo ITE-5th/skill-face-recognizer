@@ -136,10 +136,10 @@ class FaceRecognizerSkill(MycroftSkill):
         msg = RemovePersonMessage(person_name, self.user_name)
         result = self.send_recv(msg)
         if not result or result.get('result', DefaultConfig.ERROR) == DefaultConfig.ERROR:
-            self.speak_dialog("RemoveError", {'p_name': self.user_name})
+            self.speak_dialog("RemoveError", {'p_name': person_name})
             return True
         LOG.info(result)
-        self.speak_dialog("RemoveSuccess", {'p_name': self.user_name})
+        self.speak_dialog("RemoveSuccess", {'p_name': person_name})
 
         return True
 
