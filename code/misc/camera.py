@@ -14,7 +14,7 @@ class Camera:
     def take_image(self, face_count=0):
         import os
 
-        temp_dir = '/temp/'
+        temp_dir = './temp/'
         if not os.path.exists(temp_dir):
             os.makedirs(temp_dir)
 
@@ -42,7 +42,7 @@ class Camera:
         detector = dlib.get_frontal_face_detector()
         # from skimage import io
         # image = io.imread(file_name)
-        image = numpy.asarray(Image.open(file_name)).setflags(write=True)
+        image = numpy.asarray(Image.open(open(file_name, 'rb'))).setflags(write=True)
         image.setflags(write=True)
         rects = detector(image, 1)
         has_one_face = len(rects) == faces_count
