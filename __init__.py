@@ -3,7 +3,6 @@ import sys
 import traceback
 
 from adapt.intent import IntentBuilder
-from googletrans import Translator
 from mycroft import MycroftSkill, intent_handler
 from mycroft.util.log import LOG
 
@@ -22,6 +21,7 @@ LOG.warning('Running Skill Face Recognizer On Python ' + sys.version)
 
 try:
     import picamera
+    from googletrans import Translator
 except ImportError:
     # re-install yourself
     from msm import MycroftSkillsManager
@@ -138,7 +138,7 @@ class FaceRecognizerSkill(MycroftSkill):
             print("Google Speech Recognition thinks you said " + googleSTT)
             translator = Translator()
             translated = translator.translate(googleSTT, dest='en').extra_data['translation'][1][-1]
-            print(googleSTT)
+            print(translated)
             # print(translated.text)
 
         except sr.UnknownValueError:
@@ -147,7 +147,6 @@ class FaceRecognizerSkill(MycroftSkill):
 
             print("Could not request results from Google Speech Recognition service; {0}".format(e))
 
-        LOG.info(message.data)
         self.new_person = translated
         return True
 
