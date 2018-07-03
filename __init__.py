@@ -166,11 +166,11 @@ class FaceRecognizerSkill(MycroftSkill):
             msg = EndAddPersonMessage(self.new_person, self.new_person)
             result = self.send_recv(msg)
             if not result:
-                self.speak_dialog("EndAddError", {'p_name': self.user_name})
+                self.speak_dialog("EndAddError", {'p_name': self.new_person})
                 return True
             LOG.info(result)
             self.images_count = 0
-            self.speak_dialog("EndAddSuccess", {'p_name': self.user_name})
+            self.speak_dialog("EndAddSuccess", {'p_name': self.new_person})
             self.new_person = None
 
         return True
