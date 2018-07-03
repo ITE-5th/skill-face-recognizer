@@ -27,22 +27,22 @@ class Camera:
             camera.capture(file_name)
         with open(file_name, "rb") as image_file:
             encoded_string = base64.b64encode(image_file.read()).decode('utf-8')
-        if face_count > 0:
-            return encoded_string, file_name if self.check_faces(file_name=file_name, faces_count=face_count) else -1
+            if face_count > 0:
+                return encoded_string, file_name if self.check_faces(image_file=image_file,
+                                                                     faces_count=face_count) else -1
         # with open("../Image.jpg", "rb") as image_file:
         #     encoded_string = base64.b64encode(image_file.read()).decode('utf-8')
         return encoded_string, file_name
 
-    def check_faces(self, file_name='/temp/Image.jpg', faces_count=1):
+    def check_faces(self, image_file=None, faces_count=1):
         import dlib
         import numpy
         from PIL import Image
-        print(file_name)
         print('analysing faces count')
         detector = dlib.get_frontal_face_detector()
         # from skimage import io
         # image = io.imread(file_name)
-        image = numpy.asarray(Image.open(open(file_name, 'rb'))).setflags(write=True)
+        image = numpy.asarray(Image.open(image_file)).setflags(write=True)
         image.setflags(write=True)
         rects = detector(image, 1)
         has_one_face = len(rects) == faces_count
