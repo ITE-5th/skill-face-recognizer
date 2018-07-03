@@ -152,7 +152,7 @@ class FaceRecognizerSkill(MycroftSkill):
         if image is None:
             self.speak_dialog("PersonCountError")
             return True
-        msg = AddPersonMessage(image, self.new_person)
+        msg = AddPersonMessage(image, self.user_name)
         result = self.send_recv(msg)
         if not result or result.get('result', DefaultConfig.ERROR) == DefaultConfig.ERROR:
             self.speak_dialog("AddError", {'p_name': self.new_person})
@@ -162,8 +162,8 @@ class FaceRecognizerSkill(MycroftSkill):
         self.images_count += 1
         self.speak_dialog("AddSuccess", {'p_name': self.new_person, 'img_number': self.images_count})
         # END ADD
-        if self.images_count > DefaultConfig.MaxImagesCount:
-            msg = EndAddPersonMessage(self.new_person, self.new_person)
+        if self.images_count >= DefaultConfig.MaxImagesCount:
+            msg = EndAddPersonMessage(self.new_person, self.user_name)
             result = self.send_recv(msg)
             if not result:
                 self.speak_dialog("EndAddError", {'p_name': self.new_person})
