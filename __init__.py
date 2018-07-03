@@ -3,6 +3,7 @@ import sys
 import traceback
 
 from adapt.intent import IntentBuilder
+from googletrans import Translator
 from mycroft import MycroftSkill, intent_handler
 from mycroft.util.log import LOG
 
@@ -123,22 +124,21 @@ class FaceRecognizerSkill(MycroftSkill):
             return False
         return True
 
-    @intent_handler(IntentBuilder("AddFaceIntent").require('Add').require('p_name'))
+    @intent_handler(IntentBuilder("AddFaceIntent").require('Add'))
     def add(self, message):
         import speech_recognition as sr
         r = sr.Recognizer()
         with sr.Microphone() as source:
             print('recording...')
-
             audio = r.listen(source)
         print('fin recording...')
 
         try:
             googleSTT = r.recognize_google(audio, language='ar-AE')
             print("Google Speech Recognition thinks you said " + googleSTT)
-            # translator = Translator()
-            # translated = translator.translate(googleSTT, dest='en')
-            # print(googleSTT)
+            translator = Translator()
+            translated = translator.translate(googleSTT, dest='en').extra_data['translation'][1][-1]
+            print(googleSTT)
             # print(translated.text)
 
         except sr.UnknownValueError:
@@ -148,7 +148,7 @@ class FaceRecognizerSkill(MycroftSkill):
             print("Could not request results from Google Speech Recognition service; {0}".format(e))
 
         LOG.info(message.data)
-        self.new_person = message.data.get('p_name')
+        self.new_person = translated
         return True
 
     @intent_handler(IntentBuilder("RecognizeFaceIntent").require('Remove').require('p_name'))
