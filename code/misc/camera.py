@@ -3,6 +3,8 @@ import time
 
 import picamera
 
+from file_path_manager import FilePathManager
+
 
 class Camera:
 
@@ -13,8 +15,8 @@ class Camera:
 
     def take_image(self, face_count=0):
         import os
-        base_dir = os.path.dirname(os.path.realpath('__file__'))
-        camera_file = base_dir + '/resources/camera.wav'
+
+        camera_file = FilePathManager.resolve('/resources/camera.wav')
         os.system('aplay ' + camera_file)
         print(camera_file)
         temp_dir = './temp/'
