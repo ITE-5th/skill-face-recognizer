@@ -125,16 +125,22 @@ class FaceRecognizerSkill(MycroftSkill):
         return True
 
     @intent_handler(IntentBuilder("AddFaceIntent").require('Add'))
-    def add(self, message = ''):
-        p_name = self.get_person_name()
-        self.speak_dialog("AddPeronStart", {'p_name': p_name})
-        self.new_person = p_name
+    def add(self, message=''):
+
+        person_name = self.get_person_name()
+        if person_name is None:
+            return True
+
+        self.speak_dialog("AddPeronStart", {'p_name': person_name})
+        self.new_person = person_name
         return True
 
     @intent_handler(IntentBuilder("RecognizeFaceIntent").require('Remove'))
     def remove(self, message):
         LOG.info(message.data)
         person_name = self.get_person_name()
+        if person_name is None:
+            return True
         msg = RemovePersonMessage(person_name, self.user_name)
         result = self.send_recv(msg)
         if not result or result.get('result', DefaultConfig.ERROR) == DefaultConfig.ERROR:
@@ -214,16 +220,21 @@ class FaceRecognizerSkill(MycroftSkill):
             self.socket.close()
 
     def get_person_name(self):
-        phrase = self.get_phrase('what is his name', lang='ar-AE')
-        accepted_chars = set('0123456789abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ ')
-        translator = Translator()
-        translated = translator.translate(phrase, dest='en')
-        translated_text = translated.text.replace('Al ', 'Al')
-        translated_text = ''.join(filter(lambda x: x in accepted_chars, translated_text))
-        translated_phoneme = translated.extra_data['translation'][1][-1].replace('Al ', 'Al')
-        translated_phoneme = ''.join(filter(lambda x: x in accepted_chars, translated_phoneme))
-        p_name = translated_text if len(phrase.split(' ')) == len(translated_text.split(' ')) else translated_phoneme
-        return p_name
+        try:
+            phrase = self.get_phrase('what is his name', lang='ar-AE')
+            accepted_chars = set('0123456789abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ ')
+            translator = Translator()
+            translated = translator.translate(phrase, dest='en')
+            translated_text = translated.text.replace('Al ', 'Al')
+            translated_text = ''.join(filter(lambda x: x in accepted_chars, translated_text))
+            translated_phoneme = translated.extra_data['translation'][1][-1].replace('Al ', 'Al')
+            translated_phoneme = ''.join(filter(lambda x: x in accepted_chars, translated_phoneme))
+            p_name = translated_text if len(phrase.split(' ')) == len(
+                translated_text.split(' ')) else translated_phoneme
+            return p_name
+        except:
+            self.speak_dialog("PersonNameError")
+            return None
 
     def get_phrase(self, phrase_to_say, lang='en-US'):
         import speech_recognition as sr
