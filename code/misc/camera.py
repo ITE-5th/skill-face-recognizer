@@ -13,7 +13,10 @@ class Camera:
 
     def take_image(self, face_count=0):
         import os
-
+        base_dir = os.path.dirname(os.path.realpath('__file__'))
+        camera_file = base_dir + '/resources/camera.wav'
+        os.system('aplay ' + camera_file)
+        print(camera_file)
         temp_dir = './temp/'
         if not os.path.exists(temp_dir):
             os.makedirs(temp_dir)
