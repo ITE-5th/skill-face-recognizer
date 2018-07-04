@@ -126,34 +126,14 @@ class FaceRecognizerSkill(MycroftSkill):
 
     @intent_handler(IntentBuilder("AddFaceIntent").require('Add'))
     def add(self, message):
-        import speech_recognition as sr
-        r = sr.Recognizer()
-        with sr.Microphone() as source:
-            print('recording...')
-            audio = r.listen(source)
-        print('fin recording...')
-
-        try:
-            googleSTT = r.recognize_google(audio, language='ar-AE')
-            print("Google Speech Recognition thinks you said " + googleSTT)
-            translator = Translator()
-            translated = translator.translate(googleSTT, dest='en').extra_data['translation'][1][-1]
-            print(translated)
-            # print(translated.text)
-
-        except sr.UnknownValueError:
-            print("Google Speech Recognition could not understand audio")
-        except sr.RequestError as e:
-
-            print("Could not request results from Google Speech Recognition service; {0}".format(e))
-
-        self.new_person = translated
+        p_name = self.get_person_name()
+        self.new_person = p_name
         return True
 
-    @intent_handler(IntentBuilder("RecognizeFaceIntent").require('Remove').require('p_name'))
+    @intent_handler(IntentBuilder("RecognizeFaceIntent").require('Remove'))
     def remove(self, message):
         LOG.info(message.data)
-        person_name = message.data.get('p_name')
+        person_name = self.get_person_name()
         msg = RemovePersonMessage(person_name, self.user_name)
         result = self.send_recv(msg)
         if not result or result.get('result', DefaultConfig.ERROR) == DefaultConfig.ERROR:
@@ -230,6 +210,38 @@ class FaceRecognizerSkill(MycroftSkill):
         LOG.info("Face Recognizer Skill CLOSED")
         if self.socket:
             self.socket.close()
+
+    def get_person_name(self):
+        phrase = self.get_phrase('what is his name', lang='ar-AE')
+        accepted_chars = set('0123456789abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ ')
+        translator = Translator()
+        translated = translator.translate(phrase, dest='en')
+        translated_text = translated.text.replace('Al ', 'Al')
+        translated_text = ''.join(filter(lambda x: x in accepted_chars, translated_text))
+        translated_phoneme = translated.extra_data['translation'][1][-1].replace('Al ', 'Al')
+        translated_phoneme = ''.join(filter(lambda x: x in accepted_chars, translated_phoneme))
+        p_name = translated_text if len(phrase.split(' ')) == len(translated_text.split(' ')) else translated_phoneme
+        return p_name
+
+    def get_phrase(self, phrase_to_say, lang='en-US'):
+        import speech_recognition as sr
+        r = sr.Recognizer()
+        self.speak(phrase_to_say)
+        with sr.Microphone() as source:
+            print('recording...')
+            audio = r.listen(source)
+        print('fin recording...')
+
+        try:
+            text = r.recognize_google(audio, language=lang)
+            print("Google Speech Recognition thinks you said " + text)
+            return text
+
+        except sr.UnknownValueError:
+            print("Google Speech Recognition could not understand audio")
+        except sr.RequestError as e:
+            print("Could not request results from Google Speech Recognition service; {0}".format(e))
+        return None
 
     #  Deprecated because every message server checks if user is registered
     # def register_face(self):
