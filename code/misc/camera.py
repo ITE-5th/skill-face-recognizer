@@ -3,7 +3,7 @@ import time
 
 import picamera
 
-from file_path_manager import FilePathManager
+from .file_path_manager import FilePathManager
 
 
 class Camera:
