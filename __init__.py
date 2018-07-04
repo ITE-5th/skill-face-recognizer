@@ -225,12 +225,12 @@ class FaceRecognizerSkill(MycroftSkill):
             accepted_chars = set('0123456789abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ ')
             translator = Translator()
             translated = translator.translate(phrase, dest='en')
-            translated_text = translated.text.replace('Al ', 'Al')
-            translated_text = ''.join(filter(lambda x: x in accepted_chars, translated_text))
+            # translated_text = translated.text.replace('Al ', 'Al')
+            # translated_text = ''.join(filter(lambda x: x in accepted_chars, translated_text))
             translated_phoneme = translated.extra_data['translation'][1][-1].replace('Al ', 'Al')
             translated_phoneme = ''.join(filter(lambda x: x in accepted_chars, translated_phoneme))
-            p_name = translated_text if len(phrase.split(' ')) == len(
-                translated_text.split(' ')) else translated_phoneme
+            # p_name = translated_text if len(phrase.split(' ')) == len(
+            p_name = translated_phoneme
             return p_name
         except:
             self.speak_dialog("PersonNameError")
