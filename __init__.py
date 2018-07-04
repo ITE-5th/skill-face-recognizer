@@ -148,7 +148,8 @@ class FaceRecognizerSkill(MycroftSkill):
     @intent_handler(IntentBuilder("CaptureFaceIntent").require('Capture'))
     def capture(self, message):
         if self.new_person is None:
-            self.speak('Please add person before capture')
+            self.speak('Adding new friend')
+            self.add()
             return True
         image, _ = self.camera.take_image(1)
         if image is None:
