@@ -125,7 +125,7 @@ class FaceRecognizerSkill(MycroftSkill):
         return True
 
     @intent_handler(IntentBuilder("AddFaceIntent").require('Add'))
-    def add(self, message):
+    def add(self, message = ''):
         p_name = self.get_person_name()
         self.speak_dialog("AddPresonStart.dialog", {'p_name': p_name})
         self.new_person = p_name
