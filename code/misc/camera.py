@@ -17,8 +17,7 @@ class Camera:
         import os
 
         camera_file = FilePathManager.resolve('/resources/camera.wav')
-        os.system('aplay -Dhw:0,0' + camera_file)
-        print(camera_file)
+        os.system('aplay -Dhw:0,0 ' + camera_file)
         temp_dir = './temp/'
         if not os.path.exists(temp_dir):
             os.makedirs(temp_dir)
