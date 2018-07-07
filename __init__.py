@@ -89,7 +89,6 @@ class FaceRecognizerSkill(MycroftSkill):
             except Exception as e:
                 if retries <= 0:
                     LOG.warning('Cannot Connect')
-                    self.speak('Cannot Connect')
                     return False
                 self.connect()
                 LOG.warning(str(e))
@@ -119,7 +118,7 @@ class FaceRecognizerSkill(MycroftSkill):
             LOG.info('Something is wrong')
             LOG.info(str(e))
             LOG.info(str(traceback.format_exc()))
-            self.speak("Exception")
+            self.speak_dialog("UnknownError")
             self.connect()
             return False
         return True
