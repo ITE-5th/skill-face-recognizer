@@ -120,11 +120,11 @@ class FaceRecognizerSkill(MycroftSkill):
             return False
         return True
 
-    @intent_handler(IntentBuilder("AddFaceIntent").require('Add').optionally('p_name'))
+    @intent_handler(IntentBuilder("AddFaceIntent").require('Add').optionally('PName'))
     def add(self, message=''):
         try:
 
-            person_name = message.data.get("P_Name", None)
+            person_name = message.data.get("PName", None)
             if person_name is None:
                 self.speak_dialog('GetPersonName')
                 person_name = self.get_person_name()
@@ -146,11 +146,11 @@ class FaceRecognizerSkill(MycroftSkill):
             self.connect()
         return True
 
-    @intent_handler(IntentBuilder("RecognizeFaceIntent").require('Remove'))
+    @intent_handler(IntentBuilder("RecognizeFaceIntent").require('Remove').optionally('PName'))
     def remove(self, message):
         LOG.info(message.data)
         try:
-            person_name = message.data.get("P_Name", None)
+            person_name = message.data.get("PName", None)
             if person_name is None:
                 self.speak_dialog('GetPersonName')
                 person_name = self.get_person_name()
