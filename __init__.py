@@ -73,9 +73,7 @@ class FaceRecognizerSkill(MycroftSkill):
             url = self.host + url
             return request_http(url, method, msg)
         else:
-            sent = self.ensure_send(msg)
-            if not sent:
-                return None
+            self.ensure_send(msg)
             result = self.receiver.receive()
             return result
 
@@ -88,8 +86,7 @@ class FaceRecognizerSkill(MycroftSkill):
                 break
             except Exception as e:
                 if retries <= 0:
-                    LOG.warning('Cannot Connect')
-                    return False
+                    raise ConnectionError()
                 self.connect()
                 LOG.warning(str(e))
         return True
@@ -100,12 +97,8 @@ class FaceRecognizerSkill(MycroftSkill):
             image, _ = self.camera.take_image()
             LOG.warning(str(self.user_name))
             msg = FaceRecognitionMessage(image, self.user_name)
-            sent = self.ensure_send(msg)
-            if not sent:
-                self.speak_dialog('ConnectionError')
-                return False
+            response = self.send_recv(msg)
 
-            response = self.receiver.receive()
             LOG.info(response)
             recognise_result = response.get('result')
             if recognise_result == '':
@@ -113,6 +106,10 @@ class FaceRecognizerSkill(MycroftSkill):
                 return True
             result = self.handle_message(recognise_result)
             self.speak_dialog("RecogniseResult", result)
+
+        except ConnectionError as e:
+            self.speak_dialog('ConnectionError')
+            return True
 
         except Exception as e:
             LOG.info('Something is wrong')
@@ -123,31 +120,62 @@ class FaceRecognizerSkill(MycroftSkill):
             return False
         return True
 
-    @intent_handler(IntentBuilder("AddFaceIntent").require('Add'))
+    @intent_handler(IntentBuilder("AddFaceIntent").require('Add').optionally('p_name'))
     def add(self, message=''):
+        try:
 
-        person_name = self.get_person_name()
-        if person_name is None:
-            return True
+            person_name = message.data.get("P_Name", None)
+            if person_name is None:
+                self.speak_dialog('GetPersonName')
+                person_name = self.get_person_name()
 
-        self.speak_dialog("AddPeronStart", {'p_name': person_name})
-        self.new_person = person_name
+            self.speak_dialog("AddPeronStart", {'p_name': person_name})
+            self.new_person = person_name
+
+        except LookupError as e:
+            self.speak_dialog('GetPersonNameError')
+
+        except ConnectionError as e:
+            self.speak_dialog('ConnectionError')
+
+        except Exception as e:
+            LOG.info('Something is wrong')
+            LOG.info(str(e))
+            LOG.info(str(traceback.format_exc()))
+            self.speak_dialog("UnknownError")
+            self.connect()
         return True
 
     @intent_handler(IntentBuilder("RecognizeFaceIntent").require('Remove'))
     def remove(self, message):
         LOG.info(message.data)
-        person_name = self.get_person_name()
-        if person_name is None:
-            return True
-        msg = RemovePersonMessage(person_name, self.user_name)
-        result = self.send_recv(msg)
-        if not result or result.get('result', DefaultConfig.ERROR) == DefaultConfig.ERROR:
-            self.speak_dialog("RemoveError", {'p_name': person_name})
-            return True
-        LOG.info(result)
-        self.speak_dialog("RemoveSuccess", {'p_name': person_name})
+        try:
+            person_name = message.data.get("P_Name", None)
+            if person_name is None:
+                self.speak_dialog('GetPersonName')
+                person_name = self.get_person_name()
 
+            msg = RemovePersonMessage(person_name, self.user_name)
+            result = self.send_recv(msg)
+            LOG.info(result)
+
+            if not result or result.get('result', DefaultConfig.ERROR) == DefaultConfig.ERROR:
+                self.speak_dialog("RemoveError", {'p_name': person_name})
+                return True
+            self.speak_dialog("RemoveSuccess", {'p_name': person_name})
+
+        except LookupError as e:
+            self.speak_dialog('GetQuestionError')
+
+        except ConnectionError as e:
+            self.speak_dialog('ConnectionError')
+
+        except Exception as e:
+            LOG.info('Something is wrong')
+            LOG.info(str(e))
+            LOG.info(str(traceback.format_exc()))
+            self.speak_dialog("UnknownError")
+            self.connect()
         return True
 
     @intent_handler(IntentBuilder("CaptureFaceIntent").require('Capture'))
@@ -219,26 +247,23 @@ class FaceRecognizerSkill(MycroftSkill):
             self.socket.close()
 
     def get_person_name(self):
-        try:
-            phrase = self.get_phrase('what is his name', lang='ar-AE')
-            accepted_chars = set('0123456789abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ ')
-            translator = Translator()
-            translated = translator.translate(phrase, dest='en')
-            # translated_text = translated.text.replace('Al ', 'Al')
-            # translated_text = ''.join(filter(lambda x: x in accepted_chars, translated_text))
-            translated_phoneme = translated.extra_data['translation'][1][-1].replace('Al ', 'Al')
-            translated_phoneme = ''.join(filter(lambda x: x in accepted_chars, translated_phoneme))
-            # p_name = translated_text if len(phrase.split(' ')) == len(
-            p_name = translated_phoneme
-            return p_name
-        except:
-            self.speak_dialog("PersonNameError")
-            return None
+        phrase = self.get_phrase(lang='ar-AE')
+        accepted_chars = set('0123456789abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ ')
+        translator = Translator()
+        translated = translator.translate(phrase, dest='en')
+        # translated_text = translated.text.replace('Al ', 'Al')
+        # translated_text = ''.join(filter(lambda x: x in accepted_chars, translated_text))
+        translated_phoneme = translated.extra_data['translation'][1][-1].replace('Al ', 'Al')
+        translated_phoneme = ''.join(filter(lambda x: x in accepted_chars, translated_phoneme))
+        # p_name = translated_text if len(phrase.split(' ')) == len(
+        p_name = translated_phoneme
+        return p_name
 
-    def get_phrase(self, phrase_to_say, lang='en-US'):
+    @staticmethod
+    def get_phrase(lang='en-US'):
         import speech_recognition as sr
         r = sr.Recognizer()
-        self.speak(phrase_to_say)
+
         with sr.Microphone() as source:
             print('recording...')
             audio = r.listen(source)
@@ -247,13 +272,17 @@ class FaceRecognizerSkill(MycroftSkill):
         try:
             text = r.recognize_google(audio, language=lang)
             print("Google Speech Recognition thinks you said " + text)
-            return text
+
+            if text is not None or text.strip() != "":
+                return text
+            raise LookupError()
 
         except sr.UnknownValueError:
             print("Google Speech Recognition could not understand audio")
+            raise LookupError()
         except sr.RequestError as e:
             print("Could not request results from Google Speech Recognition service; {0}".format(e))
-        return None
+            raise LookupError()
 
     #  Deprecated because every message server checks if user is registered
     # def register_face(self):
