@@ -165,7 +165,7 @@ class FaceRecognizerSkill(MycroftSkill):
             self.speak_dialog("RemoveSuccess", {'p_name': person_name})
 
         except LookupError as e:
-            self.speak_dialog('GetQuestionError')
+            self.speak_dialog('GetPersonNameError')
 
         except ConnectionError as e:
             self.speak_dialog('ConnectionError')
@@ -180,35 +180,47 @@ class FaceRecognizerSkill(MycroftSkill):
 
     @intent_handler(IntentBuilder("CaptureFaceIntent").require('Capture'))
     def capture(self, message):
-        if self.new_person is None:
-            self.speak('Adding new friend')
-            self.add()
-            return True
-        image, _ = self.camera.take_image(1)
-        if image is None:
-            self.speak_dialog("PersonCountError")
-            return True
-        msg = AddPersonMessage(image, self.user_name)
-        result = self.send_recv(msg)
-        if not result or result.get('result', DefaultConfig.ERROR) == DefaultConfig.ERROR:
-            self.speak_dialog("AddError", {'p_name': self.new_person})
-            return True
-        LOG.info(result)
-
-        self.images_count += 1
-        self.speak_dialog("AddSuccess", {'p_name': self.new_person, 'img_number': self.images_count})
-        # END ADD
-        if self.images_count >= DefaultConfig.MaxImagesCount:
-            msg = EndAddPersonMessage(self.new_person, self.user_name)
+        try:
+            if self.new_person is None:
+                self.speak('Adding new friend')
+                self.add()
+                return True
+            image, _ = self.camera.take_image(1)
+            if image is None:
+                self.speak_dialog("PersonCountError")
+                return True
+            msg = AddPersonMessage(image, self.user_name)
             result = self.send_recv(msg)
-            if not result:
-                self.speak_dialog("EndAddError", {'p_name': self.new_person})
+            if not result or result.get('result', DefaultConfig.ERROR) == DefaultConfig.ERROR:
+                self.speak_dialog("AddError", {'p_name': self.new_person})
                 return True
             LOG.info(result)
-            self.images_count = 0
-            self.speak_dialog("EndAddSuccess", {'p_name': self.new_person})
-            self.new_person = None
 
+            self.images_count += 1
+            self.speak_dialog("AddSuccess", {'p_name': self.new_person, 'img_number': self.images_count})
+            # END ADD
+            if self.images_count >= DefaultConfig.MaxImagesCount:
+                msg = EndAddPersonMessage(self.new_person, self.user_name)
+                result = self.send_recv(msg)
+                if not result:
+                    self.speak_dialog("EndAddError", {'p_name': self.new_person})
+                    return True
+                LOG.info(result)
+                self.images_count = 0
+                self.speak_dialog("EndAddSuccess", {'p_name': self.new_person})
+                self.new_person = None
+        except LookupError as e:
+            self.speak_dialog('GetPersonNameError')
+
+        except ConnectionError as e:
+            self.speak_dialog('ConnectionError')
+
+        except Exception as e:
+            LOG.info('Something is wrong')
+            LOG.info(str(e))
+            LOG.info(str(traceback.format_exc()))
+            self.speak_dialog("UnknownError")
+            self.connect()
         return True
 
     @staticmethod
