@@ -58,6 +58,7 @@ class FaceRecognizerSkill(MycroftSkill):
             if self.connection_type == 'socket':
                 self.socket = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
                 LOG.info('connecting to server:' + self.host + ' : ' + str(self.port))
+                self.socket.settimeout(10)
                 self.socket.connect((self.host, self.port))
                 self.receiver = Receiver(self.socket, json=True)
                 self.sender = Sender(self.socket, json=True)
