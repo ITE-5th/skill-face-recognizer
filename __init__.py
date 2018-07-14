@@ -124,6 +124,7 @@ class FaceRecognizerSkill(MycroftSkill):
     @intent_handler(IntentBuilder("AddFaceIntent").require('Add').optionally('PName'))
     def add(self, message=None):
         try:
+            person_name = None
             if message:
                 person_name = message.data.get("PName", None)
             if person_name is None:
