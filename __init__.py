@@ -125,7 +125,7 @@ class FaceRecognizerSkill(MycroftSkill):
     def add(self, message=''):
         try:
 
-            person_name = message.data.get("PName", None)
+            person_name = message.data.get("PName", None) if message.data else None
             if person_name is None:
                 self.speak_dialog('GetPersonName')
                 person_name = self.get_person_name()
